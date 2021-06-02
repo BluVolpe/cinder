@@ -1,11 +1,9 @@
 const config = require("./config.json");
+const express = require("express");
+const path = require("path");
+const mongoose = require("mongoose");
+require("dotenv").config();
+const routes = require("./routes");
 
-var omdbURL = "https://www.omdbapi.com/?apikey=" + config.omdbKey + "&t=" + "Cars";
+const omdbURL = "https://www.omdbapi.com/?apikey=" + config.omdbKey + "&t=" + " ";
 
-    fetch(omdbURL)
-        .then(function (response) {
-            return response.json()
-        }).then(function (data) {
-            console.log("THIS IS THE DATA");
-            console.log(data);
-        });

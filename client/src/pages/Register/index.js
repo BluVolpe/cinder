@@ -5,6 +5,7 @@ import RegisterForm from "../../components/RegisterForm";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../actions/authActions";
+import "../styles/style.css"
 
 const Register = () => {
 
