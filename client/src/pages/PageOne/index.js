@@ -1,10 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { Header, Message } from "semantic-ui-react";
 import Form from "react-bootstrap/Form";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/style.css";
 
 export const PageOne = () => {
+  let [movies, setMovies] = useState();
+
+  // let [name, setName] = useState("blu");
+
+  const requestMovies = () => {
+    let url = "http://localhost:3001/movies/filter/?";
+    let vals = [];
+    var markedCheckbox = document.querySelectorAll(
+      'input[type="checkbox"]:checked'
+    );
+    for (let checkbox of markedCheckbox) {
+      vals.push(checkbox.name + "=on");
+    }
+    url += vals.join("&");
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setMovies(data.movies);
+        console.log(movies);
+      });
+  };
+
   return (
     <>
       <Message className="message-container" size="huge" secondary="true">
@@ -143,6 +165,21 @@ export const PageOne = () => {
           </div>
         ))}
       </Form>
+
+      <button onClick={requestMovies}>Send me movies!</button>
+
+      {/* {(() => {
+        if (movies !== undefined && movies !== []) {
+          return movies.map((movie) => (
+            <div>
+              <h1>{movie.Title}</h1>
+              <img src={movie.Poster} />
+            </div>
+          ));
+        } else {
+          return <p>awaiting request</p>;
+        }
+      })()} */}
     </>
   );
 };

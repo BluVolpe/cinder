@@ -4,12 +4,14 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const config = require("./config");
 const routes = require("./routes");
+const cors = require("cors")
 
 const app = express();
 
 // middleware to parse data
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
 
 // serve up static assets
 if (process.env.NODE_ENV === "production") {
