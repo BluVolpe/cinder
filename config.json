@@ -1,6 +1,6 @@
 {
     "omdbKey": "f6c265c9",
     "tmdbKey": "f49057947bb2e484b64e96b04924b0e1",
-    "MONGO_URI": "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&ssl=false",
+    "MONGO_URI": "mongodb://localhost:27017/cinder?readPreference=primary&appname=MongoDB%20Compass&ssl=false",
     "jwtSecret": "Thisisatestsecret"
 }

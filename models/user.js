@@ -1,12 +1,18 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const ReviewSchema = new Schema({
+  imbdId: String,
+  ratingOption: String,
+  movieGenres: String
+});
+
 const UserSchema = new Schema({
-  firstname: {
+  firstName: {
     type: String,
     require: true,
   },
-  lastname: {
+  lastName: {
     type: String,
     require: true,
   },
@@ -18,6 +24,10 @@ const UserSchema = new Schema({
     type: String,
     require: true,
   },
+  reviews:{
+    type: [ReviewSchema],
+    require: true,
+  }
 });
 
 module.exports = User = mongoose.model("user", UserSchema);

@@ -26,7 +26,7 @@ mongoose
     useCreateIndex: true,
     useFindAndModify: true,
   })
-  .then(() => console.log(`Mongo DB Succesfully Connected`))
+  .then(() => console.log(`Mongo DB Succesfully Connected to ${config.MONGO_URI}`))
   .catch((err) => console.log(err));
 
 // use routes

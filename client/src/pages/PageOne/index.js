@@ -3,12 +3,19 @@ import { Header, Message } from "semantic-ui-react";
 import Form from "react-bootstrap/Form";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/style.css";
+import { useSelector } from "react-redux";
 
-export const PageOne = () => {
+const apiBaseURL = 'http://localhost:3001';
+
+export const PageOne = (pops) => {
   // useState =
   let [movies, setMovies] = useState();
+  let [ratingOption, setRatingOption] = useState(null);
   let [currentMovieIndex, setMovieIndex] = useState(-1);
   let [hideFilter, setHideFilter] = useState(false);
+  const isAuthenticated = useSelector(state=>state.auth.isAuthenticated);
+  const currentUser = useSelector(state=>state.auth.currentUser);
+  const token = useSelector(state=>state.auth.token);
 
   // let [name, setName] = useState("blu");
 
@@ -22,7 +29,7 @@ export const PageOne = () => {
 
   const requestMovies = () => {
     setHideFilter(true);
-    let url = "http://localhost:3001/movies/filter/?";
+    let url = `${apiBaseURL}/movies/filter/?`;
     let vals = [];
     var markedCheckbox = document.querySelectorAll(
       'input[type="checkbox"]:checked'
@@ -39,7 +46,9 @@ export const PageOne = () => {
       });
   };
 
-  
+  const onChange = (event) => {
+    setRatingOption(event.target.value.toString());
+  };
 
   return (
     <>
@@ -198,6 +207,20 @@ export const PageOne = () => {
             <div>
               <h1>{movies[currentMovieIndex].Title}</h1>
               <img src={movies[currentMovieIndex].Poster} />
+              <div>
+                <input id="rating-opt-one" className="rating-opt-icon" type="radio" 
+                  value="Good" name="xxx"
+                  checked={ratingOption === "Good"} onChange={onChange}
+                ></input>
+                <input id="rating-opt-two" className="rating-opt-icon" type="radio" 
+                  value="Okay" name="xxx"
+                  checked={ratingOption === "Okay"} onChange={onChange}
+                ></input>
+                <input id="rating-opt-three" className="rating-opt-icon" type="radio" 
+                  value="Bad" name="xxx"
+                  checked={ratingOption === "Bad"} onChange={onChange}
+                ></input>
+              </div>
             </div>
           );
         }
@@ -205,17 +228,72 @@ export const PageOne = () => {
 
       {(() => {
         if (hideFilter) {
-          return (<button onClick={() => {
-            if (currentMovieIndex < movies.length - 1) {
-              setMovieIndex(currentMovieIndex + 1);
-            } else {
-              setMovieIndex(-1);
-              setHideFilter(false);
-              setMovies(null);
+          return (
+          <div>
+          <button onClick={() => {
+            // save their movie choice here
+            console.log(`About to save movie currentMovieIndex=${currentMovieIndex}, ratings option is ${ratingOption}`,
+              {currentUser, isAuthenticated, token}
+            );
+
+            if(!isAuthenticated) {
+              console.error('User not authenticated');
+              return;
             }
-          }}>Next Movie</button>)
+
+            const url = `${apiBaseURL}/movies`; // saving movie url
+            const movie = movies[currentMovieIndex];
+            
+            fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                userId: currentUser._id,
+                id: movie.imdbID,
+                ratingOption,
+                movieGenres: movie.Genre
+              })
+            })
+            .then(response=>{
+              if(response.ok) {
+                if (currentMovieIndex < movies.length - 1) {
+                  // reset the selected status of the radio buttons
+                  setMovieIndex(currentMovieIndex + 1);
+                  setRatingOption(null);
+                  response.json().then(console.log)
+                } else {
+                  setMovieIndex(-1);
+                  setHideFilter(false);
+                  setMovies(null);
+                }
+              } else {
+                // could not save movie
+                console.error(`could not save movie currentMovieIndex=${currentMovieIndex}, ratings option is ${ratingOption}: response status ${response.status} - ${response.statusText}`);
+              }
+            })
+            .catch (err=>{
+              console.error(`could not save movie currentMovieIndex=${currentMovieIndex}, ratings option is ${ratingOption}: caught error`, err);
+            })
+          }}>Next Movie</button>
+          <button onClick={() => {
+              if (currentMovieIndex < movies.length - 1) {
+                // reset the selected status of the radio buttons
+                setMovieIndex(currentMovieIndex + 1);
+                setRatingOption(null);
+              } else {
+                setMovieIndex(-1);
+                setHideFilter(false);
+                setMovies(null);
+              }
+          }}>Have not seen</button>
+          </div>)
         }
       })()}
+
+
 
       {/* {(() => {
         if (movies !== undefined && movies !== []) {
