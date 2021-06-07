@@ -3,29 +3,20 @@ import "../styles/style.css"
 import { Header, Message } from "semantic-ui-react";
 import { useSelector } from "react-redux";
 // import the core library.
-import ReactEChartsCore from "echarts-for-react/lib/core";
-// Import the echarts core module, which provides the necessary interfaces for using echarts.
-import * as echarts from "echarts/core";
-// Import charts, all with Chart suffix
-import { RadarChart } from "echarts/charts";
-// import components, all suffixed with Component
-import {
-  GridComponent,
-  TooltipComponent,
-  TitleComponent,
-} from "echarts/components";
-// Import renderer, note that introducing the CanvasRenderer or SVGRenderer is a required step
-import { CanvasRenderer } from "echarts/renderers";
+import RadarChart from 'react-svg-radar-chart';
+import '../styles/style.css';
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-// Register the required components
-echarts.use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  RadarChart,
-  CanvasRenderer,
-]);
+const getRatingFromText = (rating) => {
+  if (rating === "Good") {
+    return 2;
+  } else if (rating === "Okay") {
+    return 1;
+  } else if (rating === "Bad") {
+    return 0;
+  }
+}
 
 // The usage of ReactEChartsCore are same with above.
 
@@ -33,6 +24,9 @@ export const UserDashboard = () => {
   // access to the currentUser property from the auth reducer state
   const [genres, setGenres] = useState([]);
   const [userPrefs, setUserPrefs] = useState(null);
+  const [dataIndicators, setDataIndicators] = useState();
+  const [dataDoesExist, setDataDoesExist] = useState();
+  const [chartData, setChartData] = useState();
   const isAuthenticated = useSelector(state=>state.auth.isAuthenticated);
   const currentUser = useSelector(state=>state.auth.currentUser);
   const token = useSelector(state=>state.auth.token);
@@ -43,7 +37,7 @@ export const UserDashboard = () => {
   useEffect(()=>{
 
     const url = `${apiBaseURL}/movies/stats`; // saving movie url
-    
+
     fetch(url, {
       method: 'GET',
       headers: {
@@ -65,66 +59,94 @@ export const UserDashboard = () => {
       setUserPrefs(null);
       setGenres([]);
       console.error(`could not get user preferences: caught error`, err);
-    })
+    });
+
   }, []);
 
-  const indicators = (pref) => [
-    { name: "Action", max: 10 },
-    { name: "Animation", max: 10 },
-    { name: "Comedy", max: 10 },
-    { name: "Romance", max: 10 },
-    { name: "Thriller", max: 10 },
-    { name: "Adventure", max: 10 },
-    { name: "Documentary", max: 10 },
-  ];
+  useEffect(() => {
+    setDataDoesExist(false);
+    const secUrl = `${apiBaseURL}/user/movies/${currentUser._id}`
+    if (currentUser) {
+      fetch(secUrl)
+      .then(res => res.json())
+      .then(data => {
+        if (data.movies.length === 0) {
+          setDataDoesExist(true);
+        } else {
+          let points = {};
+          let allGenres = [];
 
-  const data = (pref) => [
-    {
-      value: [5.6, 6, 2, 3, 8, 3, 0],
-      name: "User",
-    },
-  ];
+          let movies = data.movies;
+          movies.forEach((movie) => {
+            let parsedGenres = movie.movieGenres.split(", ");
+            parsedGenres.forEach((genre) => {
+              allGenres.push(genre);
+              if (points[genre] === undefined) {
+                points[genre] = {
+                  total: 1,
+                  score: getRatingFromText(movie.ratingOption)
+                }
+              } else {
+                let obj = points[genre];
+                obj.total = obj.total + 1;
+                obj.score = obj.score + getRatingFromText(movie.ratingOption);
+                points[genre] = obj;
+              }
+            })
+          });
+
+          let uniqueGenres = allGenres.filter((v, i, s) => {
+            return s.indexOf(v) === i;
+          });
+
+          let captions = {};
+          uniqueGenres.forEach((genre) => {
+            captions[genre] = genre;
+          });
+
+          let preData = {};
+          uniqueGenres.forEach((genre) => {
+            return preData[genre] = (points[genre].score / points[genre].total) / 2;
+          });
+
+          setDataIndicators(captions);
+          setChartData([{data: preData, meta: {color: 'black'}}])
+        }
+      })
+    }
+  }, [currentUser])
+
+  useEffect(() => {
+    if (dataIndicators && chartData) {
+      console.log(dataIndicators)
+      console.log(chartData);
+      setDataDoesExist(true);
+    }
+  }, [dataIndicators, chartData])
 
   return (
     <>
-      <Message className="message-container" size="huge" secondary="true">
-        <Header size="huge"> User Dashboard </Header>
-        <p>This is a Protected Route</p>
+      <Message className="message-container" size="huge" secondary="true" style={{backgroundColor: "transparent", boxShadow: "none"}}>
+        <Header className="userDash" size="huge"> User Dashboard </Header>
+        <p style={{color: "white"}}>View your recommended movies <Link to="/recommended">here</Link>.</p>
         <p>Welcome {currentUser ? currentUser.email : ""}</p>
       </Message>
-      {(true)? 
-        <div className="radarChart">
-          <ReactEChartsCore
-            echarts={echarts}
-            option={{
-              title: {
-                text: "",
-              },
-              legend: {
-                data: [
-                  "",
-                  "",
-                ],
-              },
-              radar: {
-                // shape: 'circle',
-                indicator: indicators(userPrefs),
-              },
-              series: [
-                {
-                  name: "test",
-                  type: "radar",
-                  data: data(userPrefs),
-                },
-              ],
+      <div className="radarChart">
+          {dataDoesExist ? <RadarChart
+            captions={dataIndicators}
+            data={chartData}
+            size={450}
+            options={{
+              dots: true,
+              captionProps: () => ({
+                className: 'caption',
+                textAnchor: 'middle',
+                fontSize: 20,
+                fontFamily: 'sans-serif'
+              }),
             }}
-            notMerge={true}
-            lazyUpdate={true}
-          />
+          /> : <p>No data to display</p>}
         </div>
-      : 
-            <h1>loading ...</h1>
-      }
     </>
   );
 };

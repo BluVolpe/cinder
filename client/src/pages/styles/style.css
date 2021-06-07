@@ -1,19 +1,96 @@
 body {
-    background-image: linear-gradient(red, black);
-    background-size: 100%;
+  background-image: linear-gradient(red, black);
+  background-size: 100%;
 }
 
 .radarChart {
-    margin-top: 100px;
-    margin-right: 1%;
+  margin-top: 100px;
+  margin-right: 1%;
 }
 
 .genreFilter {
-    margin-left: 28%;
-    margin-top: 10%;
+  margin-left: 28%;
+  margin-top: 10%;
+  color: white;
+  text-shadow: "0px 0px 6px black";
+}
+
+.message-container {
+  text-align: center;
+  padding: 50px;
+  box-shadow: 0;
+  margin: 0;
+}
+
+.movieSearchBtn {
+  background-color: whitesmoke;
+  color: black;
+  border-radius: 50%;
+  width: 130%;
+  height: 40px;
+}
+
+svg {
+  width: 100%;
+}
+
+.shape {
+  fill-opacity: 0.3;
+}
+.shape:hover {
+  fill-opacity: 0.65;
+  z-index: 100;
+}
+.scale {
+  fill: lightgrey;
+  opacity: 50%;
+  stroke: #999;
+  stroke-width: 0.2;
+}
+.axis {
+  stroke: #555;
+  stroke-width: 0.2;
+  opacity: 50%;
+}
+.dot {
+  fill: black;
+  stroke: #e7e8e7;
+  r: 5;
+  -webkit-transition: r 0.2s;
+  -o-transition: r 0.2s;
+  transition: r 0.2s;
+}
+.dot:hover {
+  stroke: #bbb;
+  r: 8;
+}
+.caption {
+   font-size: 15px;
+  fill: white;
+  font-weight: 200;
+}
+
+polyline {
+    color: black;
+    background-color: black;
+}
+
+circle {
+    width: 90%;
+    height: auto;
+}
+
+.movieTitle {
     color: white;
 }
 
-.movieButton {
-    
+label {
+    color: white;
 }
+
+.radios {
+    text-align: center;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+/*# sourceMappingURL=index.css.map*/

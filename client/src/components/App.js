@@ -10,6 +10,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import PrivateRoute from "./PrivateRoute";
 import NoMatch from "../pages/NoMatch";
+import RecommendedMovies from "../pages/RecommendedMovies/index";
 
 export const App = () => {
 
@@ -28,8 +29,11 @@ export const App = () => {
                     <Route path="/login" component={Login} />
                     <Route path="/register" component={Register} />
                     <PrivateRoute path="/dashboard" component={UserDashboard} />
+                    <PrivateRoute path="/recommended"
+                    component={RecommendedMovies} />
                     <PrivateRoute path="/pageone" component={PageOne} />
                     <Route component={NoMatch} />
+                    
                 </Switch>
             </Router>
         </>
