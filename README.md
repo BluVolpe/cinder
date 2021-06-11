@@ -28,6 +28,6 @@ https://github.com/BluVolpe
 ## Tech
 
 ## Img
-https://drive.google.com/file/d/1AcNItS0NJD3pVBbxZdydJs12JN64X46q/view
+
 
 https://drive.google.com/file/d/1PeKmRGU7riSozpls3J0NdHq4JuT8fgix/view?usp=sharing
